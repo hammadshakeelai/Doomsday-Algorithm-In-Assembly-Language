@@ -1,0 +1,9 @@
+# Doomsday/ is its own git repository with its own remote and its own
+# GitHub Pages site (hammadshakeelai.github.io/Doomsday/). It is NOT part
+# of this repo -- ignoring it keeps git from adding it as a gitlink/submodule.
+Doomsday/
+
+# OS junk
+Thumbs.db
+desktop.ini
+.DS_Store
