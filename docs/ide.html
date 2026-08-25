@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Doomsday ASM — IDE</title>
+<style>
+  :root {
+    --bg: #0d0f13; --bg-raise: #14171d; --bg-card: #171b22;
+    --line: #232936; --text: #d8dee9; --text-dim: #8b93a3; --text-faint: #5c6575;
+    --arch: #1793d1; --green: #2fd071; --orange: #f5a623; --red: #ef4444;
+    --mono: ui-monospace, 'JetBrains Mono', 'Cascadia Code', Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 13px/1.5 var(--mono); height: 100dvh; display: flex; flex-direction: column; }
+
+  header { display: flex; align-items: center; gap: 12px; padding: 8px 12px;
+           background: var(--bg-raise); border-bottom: 1px solid var(--line); }
+  header h1 { font-size: 13px; margin: 0; font-weight: 600; color: var(--arch); }
+  header .sp { flex: 1; }
+  button { font: inherit; background: var(--bg-card); color: var(--text);
+           border: 1px solid var(--line); border-radius: 4px; padding: 4px 12px; cursor: pointer; }
+  button:hover { border-color: var(--arch); }
+  button.primary { background: var(--arch); border-color: var(--arch); color: #04202e; font-weight: 600; }
+  #status { color: var(--text-dim); font-size: 12px; }
+  #status.running { color: var(--green); }
+  #status.error   { color: var(--red); }
+
+  main { flex: 1; display: flex; min-height: 0; }
+  .pane { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+  #left  { flex: 1 1 50%; border-right: 1px solid var(--line); }
+  #right { flex: 1 1 50%; }
+  .tab { padding: 5px 12px; background: var(--bg-raise); border-bottom: 1px solid var(--line);
+         color: var(--text-dim); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+
+  /* The editor is the primary surface and is deliberately the largest text on
+     the page. Everything else is chrome and stays small, the way a real IDE
+     does it -- hierarchy here comes from colour and weight, not type scale. */
+  #editor { flex: 1; width: 100%; resize: none; border: 0; outline: none;
+            background: var(--bg); color: var(--text); font: 14px/1.65 var(--mono);
+            padding: 12px 14px; tab-size: 8; min-height: 0; }
+  #dos { flex: 1 1 auto; background: #000; min-height: 0; }
+  #console { flex: 0 0 34%; overflow: auto; padding: 8px 12px; white-space: pre-wrap;
+             border-top: 1px solid var(--line); background: var(--bg-raise); font-size: 12px; }
+  .c-dim { color: var(--text-faint); } .c-err { color: var(--red); }
+  .c-warn{ color: var(--orange); }     .c-ok  { color: var(--green); }
+
+  /* The C++ site hides its editor at 760px because that editor is decorative.
+     Here the editor is the point, so panes become tabs instead. */
+  @media (max-width: 760px) {
+    main { position: relative; }
+    .pane { position: absolute; inset: 0; }
+    body[data-view="code"] #right, body[data-view="run"] #left { display: none; }
+    body[data-view="code"] #left, body[data-view="run"] #right { display: flex; }
+    #viewtabs { display: flex; }
+  }
+  #viewtabs { display: none; gap: 6px; }
+</style>
+</head>
+<body data-view="code">
+
+<header>
+  <h1>Doomsday ASM</h1>
+  <button id="run" class="primary">Run &#9654;</button>
+  <button id="stop">Stop</button>
+  <span id="status">idle</span>
+  <span class="sp"></span>
+  <span id="viewtabs">
+    <button onclick="document.body.dataset.view='code'">Code</button>
+    <button onclick="document.body.dataset.view='run'">Terminal</button>
+  </span>
+</header>
+
+<main>
+  <section class="pane" id="left">
+    <div class="tab">prog.asm</div>
+    <textarea id="editor" spellcheck="false"></textarea>
+  </section>
+  <section class="pane" id="right">
+    <div class="tab">DOS &mdash; click the screen, then type</div>
+    <div id="dos"></div>
+    <div id="console"></div>
+  </section>
+</main>
+
+<script src="js/nasm-errors.js"></script>
+<script src="js/dosengine.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var editor  = document.getElementById('editor');
+  var consEl  = document.getElementById('console');
+  var statusEl= document.getElementById('status');
+
+  function out(text, cls) {
+    var span = document.createElement('span');
+    span.className = cls || '';
+    span.textContent = text + '\n';
+    consEl.appendChild(span);
+    consEl.scrollTop = consEl.scrollHeight;
+  }
+  function setStatus(s, cls) {
+    statusEl.textContent = s;
+    statusEl.className = cls || '';
+  }
+
+  // Everything NASM printed during this run, so diagnostics can be parsed
+  // once the assemble phase ends. DJGPP bypasses DOS redirection, so this
+  // stream is the only place NASM's errors exist.
+  var asmLines = [], phase = 'idle', t0 = 0;
+
+  var engine = new DosEngine({
+    element: document.getElementById('dos'),
+    vendor: 'vendor/',
+    onStatus: function (s) {
+      if (s === 'booting') { t0 = performance.now(); asmLines = []; phase = 'boot'; }
+      setStatus(s, s === 'running' ? 'running' : '');
+    },
+    onLine: function (line) {
+      if (line.indexOf(DosEngine.MARK_ASM) === 0) { phase = 'asm'; return; }
+
+      if (line.indexOf(DosEngine.MARK_RUN) === 0) {
+        var diags = NasmErrors.parse(asmLines.join('\n'));
+        if (diags.length) {
+          diags.forEach(function (d) {
+            out('prog.asm:' + d.line + ': ' + d.severity + ': ' + d.message,
+                d.severity === 'warning' ? 'c-warn' : 'c-err');
+          });
+        }
+        if (NasmErrors.hasErrors(diags)) {
+          out('assembly failed -- program not run', 'c-err');
+          setStatus('assembly failed', 'error');
+          engine.stop();
+          phase = 'dead';
+          return;
+        }
+        out('assembled ok (' + Math.round(performance.now() - t0) + ' ms)', 'c-ok');
+        phase = 'run';
+        return;
+      }
+
+      if (line.indexOf(DosEngine.MARK_END) === 0) {
+        if (phase !== 'dead') {
+          out('[' + ((performance.now() - t0) / 1000).toFixed(3) + 's] program exited', 'c-dim');
+          setStatus('done');
+          phase = 'done';
+        }
+        return;
+      }
+
+      // When NASM failed, prog.com was never written and DOS complains about
+      // it. That is a consequence of the real error, not news -- don't show it.
+      if (phase === 'dead' && /Illegal command/i.test(line)) return;
+
+      // Collect NASM's output silently -- it is reprinted, parsed and
+      // colour-coded at MARK_RUN. Echoing here would double every message.
+      if (phase === 'asm') asmLines.push(line);
+      else out(line);
+    },
+  });
+
+  document.getElementById('run').onclick = function () {
+    consEl.textContent = '';
+    if (window.innerWidth <= 760) document.body.dataset.view = 'run';
+    engine.run(editor.value).catch(function (e) {
+      out('engine error: ' + (e && e.message || e), 'c-err');
+      setStatus('error', 'error');
+    });
+  };
+  document.getElementById('stop').onclick = function () { engine.stop(); setStatus('stopped'); };
+
+  // Seed with the smoke test so the page does something useful on first load.
+  fetch('asm/smoke.asm')
+    .then(function (r) { return r.ok ? r.text() : ''; })
+    .then(function (t) { editor.value = t || '        org 100h\n'; })
+    .catch(function () { editor.value = '        org 100h\n'; });
+})();
+</script>
+</body>
+</html>
