@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Doomsday in 8086 Assembly</title>
+<style>
+  :root {
+    --bg:#0d0f13; --bg-card:#171b22; --line:#232936;
+    --text:#d8dee9; --text-dim:#8b93a3; --arch:#1793d1; --green:#2fd071;
+    --mono: ui-monospace,'JetBrains Mono','Cascadia Code',Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:15px/1.65 var(--mono);
+       padding:48px 20px;display:flex;justify-content:center}
+  main{max-width:720px;width:100%}
+  h1{color:var(--arch);font-size:22px;margin:0 0 6px}
+  .sub{color:var(--text-dim);margin:0 0 32px}
+  a.cta{display:inline-block;background:var(--arch);color:#04202e;font-weight:600;
+        text-decoration:none;padding:9px 18px;border-radius:5px}
+  h2{font-size:14px;text-transform:uppercase;letter-spacing:.09em;
+     color:var(--text-dim);margin:36px 0 12px;font-weight:600}
+  ul{padding-left:20px;margin:0}
+  li{margin:6px 0}
+  code{background:var(--bg-card);border:1px solid var(--line);
+       border-radius:3px;padding:1px 5px;font-size:13px}
+  .note{border-left:2px solid var(--green);padding-left:14px;color:var(--text-dim);
+        margin:20px 0}
+  footer{margin-top:44px;color:var(--text-dim);font-size:13px;
+         border-top:1px solid var(--line);padding-top:16px}
+  a{color:var(--arch)}
+</style>
+</head>
+<body>
+<main>
+  <h1>Doomsday in 8086 Assembly</h1>
+  <p class="sub">Conway's Doomsday algorithm, written from scratch in NASM &mdash;
+     with a browser IDE that assembles and runs it, so DOSBox is optional.</p>
+
+  <p><a class="cta" href="ide.html">Open the IDE &#9654;</a></p>
+
+  <h2>What the IDE is</h2>
+  <p>Real DOSBox, compiled to WebAssembly, with NASM installed inside it. You
+     write 8086 assembly, press Run, and a DOS machine boots, assembles your
+     source, and executes it &mdash; entirely in the browser. Nothing is sent
+     anywhere; there is no server.</p>
+
+  <div class="note">Because it is genuinely DOS and genuinely NASM, anything
+     that works here works in a real DOSBox. It is a faster way to run the same
+     toolchain, not a simulation of it.</div>
+
+  <h2>Writing code for it</h2>
+  <ul>
+    <li>Flat <code>.COM</code> programs: start with <code>org 100h</code></li>
+    <li>Print with <code>int 21h</code>, <code>AH=09h</code> ($-terminated) or <code>AH=02h</code></li>
+    <li>Read a line with <code>AH=0Ah</code>, a character with <code>AH=01h</code></li>
+    <li>Exit with <code>AX=4C00h</code></li>
+    <li>NASM syntax, not MASM: no <code>.MODEL</code>, and a label is already its address</li>
+  </ul>
+
+  <h2>The algorithm</h2>
+  <p>Every year has a weekday &mdash; its <em>doomsday</em> &mdash; that a known
+     set of easy dates all land on. Find it, and any date is a short hop away.
+     The same algorithm was implemented in C++ first; that version and its
+     explanation live in the
+     <a href="https://hammadshakeelai.github.io/Doomsday/">Doomsday</a> project.</p>
+
+  <footer>
+    Runs on <a href="https://js-dos.com/">js-dos</a> (DOSBox, GPL-2.0) and
+    <a href="https://www.nasm.us/">NASM</a> (BSD-2). No trackers, no backend.
+  </footer>
+</main>
+</body>
+</html>
