@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>runner</title>
+<link rel="stylesheet" href="vendor/js-dos/js-dos.css">
+<style>
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+  #dos { width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+<div id="dos"></div>
+
+<script src="vendor/js-dos/js-dos.js"></script>
+<script>
+// One emulator, one throwaway JS realm.
+//
+// js-dos keeps module-level state and will not cleanly re-initialise a second
+// time in the same document -- the second Dos() call boots to nothing. Rather
+// than fight that, each run gets its own iframe, which is destroyed afterwards.
+// (TweetX86 reached the same conclusion for the same reason.)
+//
+// Protocol with the parent:
+//   parent -> here : { type:'run', source, cmds }
+//   here -> parent : { type:'ready' } | { type:'line', line } | { type:'status', status }
+(function () {
+  'use strict';
+
+  function post(msg) { parent.postMessage(Object.assign({ __ddasm: true }, msg), '*'); }
+
+  function fetchBin(url) {
+    return fetch(url).then(function (r) {
+      if (!r.ok) throw new Error(url + ' -> HTTP ' + r.status);
+      return r.arrayBuffer();
+    }).then(function (a) { return new Uint8Array(a); });
+  }
+
+  function boot(source, cmds) {
+    return Promise.all([
+      fetchBin('vendor/dos/nasm.exe'),
+      fetchBin('vendor/dos/cwsdpmi.exe'),
+    ]).then(function (bin) {
+      post({ type: 'status', status: 'booting' });
+
+      var conf = [
+        '[sdl]', 'autolock=false',
+        '[dosbox]', 'memsize=32',
+        '[cpu]', 'core=auto', 'cputype=auto', 'cycles=max',
+        '[dos]', 'xms=true', 'ems=true', 'umb=true',
+        // A custom dosboxConf replaces js-dos's default wholesale, including
+        // its mount lines. Omit these and every command is "Illegal command".
+        '[autoexec]', 'mount c .', 'c:',
+      ].concat(cmds).join('\n') + '\n';
+
+      window.Dos(document.getElementById('dos'), {
+        pathPrefix: 'vendor/js-dos/emulators/',
+        dosboxConf: conf,
+        jsdosConf: { version: '8.4.1' },
+        initFs: [
+          { path: 'nasm.exe', contents: bin[0] },
+          { path: 'cwsdpmi.exe', contents: bin[1] },
+          { path: 'prog.asm', contents: new TextEncoder().encode(source) },
+        ],
+        backend: 'dosbox',
+        autoStart: true,
+        noCloud: true,
+        kiosk: true,
+        onEvent: function (event, ci) {
+          if (event !== 'ci-ready') return;
+          window.CI = ci;
+          post({ type: 'status', status: 'running' });
+          ci.events().onStdout(function (raw) {
+            post({ type: 'line', line: raw.replace(/\x1b\[[0-9;]*m/g, '').replace(/\s+$/, '') });
+          });
+          ci.events().onExit(function () { post({ type: 'status', status: 'exited' }); });
+        },
+      });
+    }).catch(function (e) {
+      post({ type: 'status', status: 'error', message: String(e && e.message || e) });
+    });
+  }
+
+  window.addEventListener('message', function (ev) {
+    var d = ev.data;
+    if (!d || d.type !== 'run') return;
+    boot(d.source, d.cmds);
+  });
+
+  post({ type: 'ready' });
+})();
+</script>
+</body>
+</html>
