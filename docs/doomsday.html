@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>doomsday.asm — running</title>
+<meta name="description" content="The Doomsday algorithm in 8086 assembly, assembled by NASM and run in a real DOSBox, in the browser.">
+<link rel="stylesheet" href="css/vscode.css">
+</head>
+<body data-view="run">
+
+<div class="vsc-titlebar">
+  <a class="home" href="index.html">&#8592; Doomsday</a>
+  <span class="title">doomsday.asm &mdash; NASM &#183; DOSBox &#183; 8086</span>
+  <span id="viewtabs">
+    <button class="btn" type="button" data-view="code">Code</button>
+    <button class="btn" type="button" data-view="run">Run</button>
+  </span>
+</div>
+
+<div class="vsc-main">
+
+  <nav class="vsc-activity" aria-hidden="true">
+    <div class="ico active"><svg viewBox="0 0 16 16"><path d="M9.5 1H3.75C3.34 1 3 1.34 3 1.75v12.5c0 .41.34.75.75.75h8.5c.41 0 .75-.34.75-.75V4.5L9.5 1zM4.5 2.5h4v3h3v8h-7v-11z"/></svg></div>
+    <div class="ico"><svg viewBox="0 0 16 16"><path d="M11.13 9.54a4.5 4.5 0 1 0-1.59 1.59l2.66 2.66 1.59-1.59-2.66-2.66zM7 10a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg></div>
+    <div class="ico"><svg viewBox="0 0 16 16"><path d="M12.5 2h-9C2.67 2 2 2.67 2 3.5v9c0 .83.67 1.5 1.5 1.5h9c.83 0 1.5-.67 1.5-1.5v-9c0-.83-.67-1.5-1.5-1.5zM7 11H5.5L3.5 8l2-3H7L5 8l2 3zm4 0H9.5l2-3-2-3H11l2 3-2 3z"/></svg></div>
+    <div class="ico"><svg viewBox="0 0 16 16"><path d="M8 1 1.5 4.5v7L8 15l6.5-3.5v-7L8 1zm0 2 4.5 2.4v.1L8 7.9 3.5 5.5v-.1L8 3zm-5 4.2 4 2.1v3.6l-4-2.1V7.2zm6 5.7V9.3l4-2.1v3.6l-4 2.1z"/></svg></div>
+    <div class="spacer"></div>
+  </nav>
+
+  <!-- Source. Read-only by construction: this is markup, not a textarea. -->
+  <section class="vsc-editor">
+    <div class="vsc-tabs">
+      <div class="vsc-tab">
+        <span class="ticon">ASM</span>doomsday.asm
+        <span class="ro">read-only</span>
+      </div>
+    </div>
+    <div class="vsc-code" id="code" tabindex="0" role="region"
+         aria-label="Source of doomsday.asm. Read-only."></div>
+  </section>
+
+  <!-- The machine. Given the width because it is the thing worth watching. -->
+  <section class="vsc-side">
+    <div class="vsc-tabs">
+      <div class="vsc-tab"><span class="ticon">DOS</span>DOSBox</div>
+      <span class="sp"></span>
+      <span id="status" role="status">idle</span>
+      <button id="run" class="btn primary" type="button">Rerun &#9654;</button>
+      <button id="stop" class="btn" type="button" disabled>Stop</button>
+      <a class="btn" href="ide.html?src=asm/doomsday.asm">Edit in the IDE</a>
+    </div>
+
+    <div class="vsc-dos" id="dos">
+      <div class="dos-overlay" id="overlay" role="alert">
+        <p class="big" id="overlay-title"></p>
+        <p id="overlay-body"></p>
+        <button class="btn primary" type="button" id="overlay-btn" hidden></button>
+      </div>
+    </div>
+
+    <!-- Debug panel: NASM diagnostics, timings, and the program's own stdout. -->
+    <div class="vsc-panel">
+      <div class="vsc-panel-tabs">
+        <div class="ptab active">Debug</div>
+        <div class="vsc-panel-actions">
+          <button class="act" type="button" id="clear">Clear</button>
+          <button class="act" type="button" id="collapse" aria-expanded="true">Hide</button>
+        </div>
+      </div>
+      <div class="vsc-terminal" id="console" role="log" aria-live="polite"
+           aria-label="Assembler diagnostics and program output"></div>
+    </div>
+  </section>
+</div>
+
+<!-- The program reads with int 21h AH=01h. On a phone there is no keyboard
+     until something focuses an input, and the emulator canvas never will. -->
+<div class="keydeck" aria-label="On-screen keys">
+  <div class="keyrow" id="keys-num"></div>
+  <div class="keyrow">
+    <button class="key wide" type="button" data-key="enter">Enter</button>
+    <button class="key wide" type="button" data-key="backspace">&#9003;</button>
+    <button class="key wide" type="button" data-key="esc">Esc</button>
+  </div>
+</div>
+
+<div class="vsc-status">
+  <span class="seg" id="diagcount">&#10005; 0&nbsp;&nbsp;&#9888; 0</span>
+  <span class="seg" id="tabnote" hidden>paused in background</span>
+  <span class="sp"></span>
+  <span class="seg">NASM &#183; flat .COM &#183; org 100h</span>
+  <span class="seg"><a href="index.html">About this project</a></span>
+</div>
+
+<script src="js/nasm-errors.js"></script>
+<script src="js/dosengine.js"></script>
+<script src="js/runlog.js"></script>
+<script src="js/asm-view.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var SRC = 'asm/doomsday.asm';
+
+  var consEl  = document.getElementById('console');
+  var statusEl= document.getElementById('status');
+  var runBtn  = document.getElementById('run');
+  var stopBtn = document.getElementById('stop');
+  var countEl = document.getElementById('diagcount');
+  var view    = new AsmView(document.getElementById('code'));
+
+  var source = null;        // set once the .asm has loaded
+  var errs = 0, warns = 0;
+  var lastOut = 0, hinted = false, wasHidden = false;
+
+  function out(text, cls) {
+    var span = document.createElement('span');
+    span.className = cls || '';
+    span.textContent = text + '\n';
+    consEl.appendChild(span);
+    consEl.scrollTop = consEl.scrollHeight;
+  }
+  function setStatus(s, cls) {
+    statusEl.textContent = s;
+    statusEl.className = cls || '';
+  }
+  function setCount() {
+    countEl.innerHTML = '&#10005; ' + errs + '&nbsp;&nbsp;&#9888; ' + warns;
+  }
+
+  function overlay(title, body, btnLabel, onClick) {
+    var el = document.getElementById('overlay');
+    var b  = document.getElementById('overlay-btn');
+    if (!title) { el.classList.remove('show'); return; }
+    document.getElementById('overlay-title').textContent = title;
+    document.getElementById('overlay-body').textContent = body || '';
+    b.hidden = !btnLabel;
+    if (btnLabel) { b.textContent = btnLabel; b.onclick = onClick; }
+    el.classList.add('show');
+  }
+
+  // ------------------------------------------------------------------ engine
+
+  var log = new RunLog({
+    file: 'doomsday.asm',           // what the reader sees; DOS knows it as prog.asm
+    onEntry: out,
+    onState: setStatus,
+    onDiag: function (d) {
+      if (d.severity === 'warning') warns++; else errs++;
+      setCount();
+      view.markLine(d.line, d.severity);
+    },
+    onAbort: function () {
+      engine.stop();
+      stopBtn.disabled = true;
+      view.revealFirstMark();
+      if (window.innerWidth <= 760) document.body.dataset.view = 'code';
+    },
+  });
+
+  var engine = new DosEngine({
+    element: document.getElementById('dos'),
+    onStatus: function (s) {
+      if (s === 'booting') log.reset();
+      if (s === 'running') overlay(null);
+      setStatus(s, s === 'running' ? 'running' : (/^error/.test(s) ? 'error' : ''));
+    },
+    onLine: function (line) {
+      lastOut = performance.now();
+      log.line(line);
+    },
+  });
+
+  function start() {
+    if (source === null) return;
+    consEl.textContent = '';
+    out('booting DOSBox and assembling doomsday.asm...', 'c-dim');
+    view.clearMarks();
+    errs = 0; warns = 0; setCount();
+    hinted = false;
+    lastOut = performance.now();
+    overlay(null);
+    stopBtn.disabled = false;
+    if (window.innerWidth <= 760) document.body.dataset.view = 'run';
+
+    engine.run(source).catch(function (e) {
+      out('engine error: ' + (e && e.message || e), 'c-err');
+      setStatus('error', 'error');
+      stopBtn.disabled = true;
+      overlay('Could not start DOSBox', String(e && e.message || e), 'Try again', start);
+    });
+  }
+
+  runBtn.onclick = start;
+  stopBtn.onclick = function () {
+    engine.stop();
+    setStatus('stopped');
+    stopBtn.disabled = true;
+    out('stopped', 'c-dim');
+  };
+
+  // ------------------------------------------------------------------- panel
+
+  document.getElementById('clear').onclick = function () { consEl.textContent = ''; };
+  document.getElementById('collapse').onclick = function () {
+    var hidden = document.body.classList.toggle('panel-collapsed');
+    this.textContent = hidden ? 'Show' : 'Hide';
+    this.setAttribute('aria-expanded', String(!hidden));
+  };
+
+  // ------------------------------------------------------------------ phones
+
+  Array.prototype.forEach.call(document.querySelectorAll('#viewtabs button'), function (b) {
+    b.onclick = function () { document.body.dataset.view = b.dataset.view; };
+  });
+
+  var numrow = document.getElementById('keys-num');
+  for (var d = 0; d <= 9; d++) {
+    var k = document.createElement('button');
+    k.className = 'key'; k.type = 'button';
+    k.dataset.key = String(d); k.textContent = String(d);
+    numrow.appendChild(k);
+  }
+  document.querySelector('.keydeck').addEventListener('click', function (ev) {
+    var key = ev.target && ev.target.dataset && ev.target.dataset.key;
+    if (key) engine.sendKey(DosEngine.KBD[key]);
+  });
+
+  // ------------------------------------------------- reliability notices (NFR)
+
+  // js-dos drives DOSBox from requestAnimationFrame, so a backgrounded tab
+  // stops the machine dead (DESIGN.md trap 6). That looks exactly like a hang,
+  // and the bug report it produces is unanswerable without this line.
+  document.addEventListener('visibilitychange', function () {
+    var live = !stopBtn.disabled;
+    if (document.hidden) {
+      if (live) { wasHidden = true; document.getElementById('tabnote').hidden = false; }
+    } else if (wasHidden) {
+      wasHidden = false;
+      document.getElementById('tabnote').hidden = true;
+      out('this tab was in the background -- DOSBox is paused there, and has resumed', 'c-dim');
+      lastOut = performance.now();
+    }
+  });
+
+  // A stuck program and a program waiting for you to type look identical from
+  // out here, so this hints rather than acting. Typing echoes through stdout,
+  // which resets the clock -- the hint only appears during real silence.
+  setInterval(function () {
+    if (hinted || stopBtn.disabled || document.hidden) return;
+    if (log.phase === 'run' && performance.now() - lastOut > 45000) {
+      hinted = true;
+      out('no output for 45s -- if the program is stuck, press Stop', 'c-dim');
+    }
+  }, 5000);
+
+  // ------------------------------------------------------------------- boot
+
+  if (typeof WebAssembly !== 'object') {
+    runBtn.disabled = true;
+    overlay('This browser cannot run the emulator',
+            'DOSBox here is WebAssembly, and this browser does not support it. ' +
+            'The source is still readable on the left.');
+  }
+
+  view.load(SRC).then(function (text) {
+    source = text;
+    out('loaded doomsday.asm (' + view.rows.length + ' lines)', 'c-dim');
+    if (runBtn.disabled) return;
+
+    // Auto-run, but only once the tab is actually visible -- starting a machine
+    // that cannot tick just produces a black rectangle and a false "booting".
+    if (!document.hidden) return start();
+    overlay('Paused', 'This tab is in the background. DOSBox will start when you come back.');
+    document.addEventListener('visibilitychange', function once() {
+      if (document.hidden) return;
+      document.removeEventListener('visibilitychange', once);
+      start();
+    });
+  }).catch(function (e) {
+    out('could not load ' + SRC + ': ' + (e && e.message || e), 'c-err');
+    setStatus('load failed', 'error');
+    runBtn.disabled = true;
+  });
+})();
+</script>
+</body>
+</html>
