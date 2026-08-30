@@ -17,7 +17,7 @@
 # Doomsday algorithm, implemented in assembly language by hand from scratch
 
 Conway's Doomsday algorithm — the trick for working out the weekday of any date
-in your head — written as 480 lines of 8086 assembly. No libraries, no runtime,
+in your head — written as 723 lines of 8086 assembly. No libraries, no runtime,
 no framework. Just `org 100h`, `int 21h`, and arithmetic done by hand.
 
 **Along with it, a website that live-demonstrates the program running.** Real
@@ -121,14 +121,12 @@ node tools/test-nasm-errors.js
 
 ## Status
 
-The toolchain is verified end to end: `doomsday.asm` assembles with zero NASM
-errors, runs, and accepts typed input through all three prompts on desktop and
-mobile.
+Working end to end. `doomsday.asm` assembles with zero NASM errors, runs, accepts
+typed input through all three prompts on desktop and mobile, and reports the
+correct weekday.
 
-**Known issue:** the program prints ` So on Year ` and then stops before
-reporting the weekday — it reaches its century-anchor block and does not print
-again. Tracked in [DESIGN.md](DESIGN.md#verified-by-hand-2026-08-30) with the
-first place to look.
+Verified by hand: `2026 / 08 / 30` → **Sunday** (doomsday 2026 is Saturday; 8/8
+is an anchor, +22 days) and `2000 / 12 / 12` → **Tuesday** (12/12 is an anchor).
 
 ## Credits
 
