@@ -33,8 +33,7 @@
     <!-- Title block -->
     <text x="64" y="112" font-size="13" letter-spacing="4.2" fill="#55555f">NASM &#183; 8086 &#183; REAL DOSBOX</text>
 
-    <text x="64" y="182" font-size="58" font-weight="700" fill="#ffffff" letter-spacing="-1">DOOMSDAY</text>
-    <text x="64" y="182" font-size="58" font-weight="700" fill="#55ffff" letter-spacing="-1" dx="322">.asm</text>
+    <text x="64" y="182" font-size="58" font-weight="700" letter-spacing="-1" fill="#ffffff">DOOMSDAY<tspan fill="#55ffff">.asm</tspan></text>
 
     <rect x="64" y="204" width="58" height="3" fill="#ffff55"/>
 
