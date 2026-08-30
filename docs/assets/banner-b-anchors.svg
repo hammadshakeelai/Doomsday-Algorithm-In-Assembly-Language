@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" width="1200" height="360" role="img" aria-label="Doomsday.asm - the anchor dates 4/4, 6/6, 8/8, 10/10 and 12/12 all fall on the same weekday">
+  <title>Doomsday in 8086 Assembly</title>
+
+  <defs>
+    <pattern id="scanB" width="4" height="4" patternUnits="userSpaceOnUse">
+      <rect width="4" height="2" fill="#ffffff" opacity="0.015"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="360" fill="#07070c"/>
+  <rect width="1200" height="360" fill="url(#scanB)"/>
+  <rect x="0" y="0" width="1200" height="2" fill="#ffff55"/>
+
+  <g font-family="Consolas, 'DejaVu Sans Mono', Menlo, ui-monospace, monospace">
+
+    <!-- Wordmark -->
+    <text x="64" y="120" font-size="12.5" letter-spacing="4" fill="#55555f">BY HAND &#183; FROM SCRATCH &#183; NO LIBRARIES</text>
+
+    <text x="64" y="196" font-size="68" font-weight="700" letter-spacing="-2" fill="#ffffff">DOOMSDAY<tspan fill="#55ffff">.asm</tspan></text>
+
+    <text x="64" y="244" font-size="17" fill="#b6b6c2">Conway&#8217;s weekday algorithm in 8086 assembly,</text>
+    <text x="64" y="270" font-size="17" fill="#b6b6c2">assembled by NASM inside a real DOSBox &#8212;</text>
+    <text x="64" y="296" font-size="17" fill="#7c7c8a">in the browser, with nothing installed.</text>
+
+    <!-- The algorithm itself, which is a better ornament than an ornament:
+         these five dates share a weekday, and that weekday is the doomsday. -->
+    <g>
+      <g font-size="23" font-weight="700" fill="#ffff55" text-anchor="end">
+        <text x="836" y="106">4/4</text>
+        <text x="836" y="146">6/6</text>
+        <text x="836" y="186">8/8</text>
+        <text x="836" y="226">10/10</text>
+        <text x="836" y="266">12/12</text>
+      </g>
+
+      <g stroke="#3a3a48" stroke-width="1.5" fill="none">
+        <path d="M852 99 h18"/>
+        <path d="M852 139 h18"/>
+        <path d="M852 179 h18"/>
+        <path d="M852 219 h18"/>
+        <path d="M852 259 h18"/>
+        <path d="M870 99 V259"/>
+      </g>
+      <path d="M870 179 h26" stroke="#ffff55" stroke-width="2" fill="none"/>
+      <circle cx="900" cy="179" r="3.5" fill="#ffff55"/>
+
+      <text x="916" y="172" font-size="18" fill="#ffffff">all fall on the same weekday.</text>
+      <text x="916" y="197" font-size="18" fill="#55ffff">That weekday is the year&#8217;s doomsday.</text>
+      <text x="916" y="232" font-size="14" fill="#7c7c8a">Find it, and any date is a short hop away.</text>
+    </g>
+
+    <text x="64" y="338" font-size="12" fill="#55555f" letter-spacing="1.6">ORG 100H &#183; NASM -F BIN &#183; INT 21H &#183; DOSBOX COMPILED TO WEBASSEMBLY</text>
+  </g>
+</svg>
