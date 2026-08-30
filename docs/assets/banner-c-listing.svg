@@ -21,32 +21,32 @@
   <g mask="url(#listingMask)"
      font-family="Consolas, 'DejaVu Sans Mono', Menlo, ui-monospace, monospace" font-size="15.5">
     <g fill="#3d3d49" text-anchor="end">
-      <text x="516" y="56">1</text>
-      <text x="516" y="78">2</text>
-      <text x="516" y="100">3</text>
-      <text x="516" y="122">4</text>
-      <text x="516" y="144">5</text>
-      <text x="516" y="166">6</text>
-      <text x="516" y="188">7</text>
-      <text x="516" y="210">8</text>
-      <text x="516" y="232">9</text>
-      <text x="516" y="254">10</text>
-      <text x="516" y="276">11</text>
-      <text x="516" y="298">12</text>
-      <text x="516" y="320">13</text>
-      <text x="516" y="342">14</text>
+      <text x="516" y="48">1</text>
+      <text x="516" y="69">2</text>
+      <text x="516" y="90">3</text>
+      <text x="516" y="111">4</text>
+      <text x="516" y="132">5</text>
+      <text x="516" y="153">6</text>
+      <text x="516" y="174">7</text>
+      <text x="516" y="195">8</text>
+      <text x="516" y="216">9</text>
+      <text x="516" y="237">10</text>
+      <text x="516" y="258">11</text>
+      <text x="516" y="279">12</text>
+      <text x="516" y="300">13</text>
+      <text x="516" y="321">14</text>
     </g>
     <g fill="#d4d4d4">
-      <text x="548" y="56">[<tspan fill="#c586c0">org</tspan> <tspan fill="#b5cea8">0x100</tspan>]</text>
-      <text x="548" y="100"><tspan fill="#569cd6">mov</tspan> <tspan fill="#9cdcfe">ah</tspan>,<tspan fill="#b5cea8">0x09</tspan></text>
-      <text x="548" y="122"><tspan fill="#569cd6">mov</tspan> <tspan fill="#9cdcfe">dx</tspan>,msg1</text>
-      <text x="548" y="144"><tspan fill="#569cd6">int</tspan> <tspan fill="#b5cea8">0x21</tspan></text>
-      <text x="548" y="188"><tspan fill="#569cd6">mov</tspan> <tspan fill="#9cdcfe">dx</tspan>,msg2</text>
-      <text x="548" y="210"><tspan fill="#569cd6">int</tspan> <tspan fill="#b5cea8">0x21</tspan></text>
-      <text x="548" y="254"><tspan fill="#569cd6">mov</tspan> <tspan fill="#9cdcfe">ah</tspan>,<tspan fill="#b5cea8">0x01</tspan></text>
-      <text x="548" y="276"><tspan fill="#569cd6">int</tspan> <tspan fill="#b5cea8">0x21</tspan></text>
-      <text x="548" y="298"><tspan fill="#569cd6">sub</tspan> <tspan fill="#9cdcfe">al</tspan>,<tspan fill="#ce9178">&#39;0&#39;</tspan></text>
-      <text x="548" y="342"><tspan fill="#569cd6">mov</tspan> [<tspan fill="#dcdcaa">year</tspan>],<tspan fill="#9cdcfe">al</tspan></text>
+      <text x="548" y="48">[<tspan fill="#c586c0">org</tspan> <tspan fill="#b5cea8">0x100</tspan>]</text>
+      <text x="548" y="90"><tspan fill="#569cd6">mov</tspan> <tspan fill="#9cdcfe">ah</tspan>,<tspan fill="#b5cea8">0x09</tspan></text>
+      <text x="548" y="111"><tspan fill="#569cd6">mov</tspan> <tspan fill="#9cdcfe">dx</tspan>,msg1</text>
+      <text x="548" y="132"><tspan fill="#569cd6">int</tspan> <tspan fill="#b5cea8">0x21</tspan></text>
+      <text x="548" y="174"><tspan fill="#569cd6">mov</tspan> <tspan fill="#9cdcfe">dx</tspan>,msg2</text>
+      <text x="548" y="195"><tspan fill="#569cd6">int</tspan> <tspan fill="#b5cea8">0x21</tspan></text>
+      <text x="548" y="237"><tspan fill="#569cd6">mov</tspan> <tspan fill="#9cdcfe">ah</tspan>,<tspan fill="#b5cea8">0x01</tspan></text>
+      <text x="548" y="258"><tspan fill="#569cd6">int</tspan> <tspan fill="#b5cea8">0x21</tspan></text>
+      <text x="548" y="279"><tspan fill="#569cd6">sub</tspan> <tspan fill="#9cdcfe">al</tspan>,<tspan fill="#ce9178">&#39;0&#39;</tspan></text>
+      <text x="548" y="321"><tspan fill="#569cd6">mov</tspan> [<tspan fill="#dcdcaa">year</tspan>],<tspan fill="#9cdcfe">al</tspan></text>
     </g>
   </g>
 
@@ -56,12 +56,12 @@
   <g font-family="Consolas, 'DejaVu Sans Mono', Menlo, ui-monospace, monospace">
     <text x="64" y="118" font-size="12.5" letter-spacing="4" fill="#55555f">480 LINES &#183; NO LIBRARIES</text>
 
-    <text x="64" y="188" font-size="60" font-weight="700" letter-spacing="-1.6" fill="#ffffff">DOOMSDAY<tspan fill="#55ffff">.asm</tspan></text>
+    <text x="64" y="174" font-size="60" font-weight="700" letter-spacing="-1.6" fill="#ffffff">DOOMSDAY<tspan fill="#55ffff">.asm</tspan></text>
 
-    <rect x="64" y="210" width="58" height="3" fill="#ffff55"/>
+    <rect x="64" y="195" width="58" height="3" fill="#ffff55"/>
 
     <text x="64" y="250" font-size="17" fill="#b6b6c2">Conway&#8217;s weekday algorithm, written by</text>
-    <text x="64" y="276" font-size="17" fill="#b6b6c2">hand in 8086 assembly. NASM and DOSBox</text>
+    <text x="64" y="258" font-size="17" fill="#b6b6c2">hand in 8086 assembly. NASM and DOSBox</text>
     <text x="64" y="302" font-size="17" fill="#7c7c8a">run it live in your browser.</text>
   </g>
 </svg>
