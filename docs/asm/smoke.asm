@@ -54,7 +54,7 @@ start:
         mov     ax, 4C00h       ; exit, status 0
         int     21h
 
-banner  db      'Doomsday IDE smoke test', 0Dh, 0Ah, 0Dh, 0Ah, '$'
+banner  db      'Doomsday IDE smoke test', 0Dh, 0Ah, 0Dh, 0Ah, 'Hello, World!', 0Dh, 0Ah, 0Ah, '$'
 prompt  db      'Tell me Year: $'
 echoed  db      'You typed: $'
 crlf    db      0Dh, 0Ah, '$'
