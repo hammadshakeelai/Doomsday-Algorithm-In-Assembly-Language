@@ -26,27 +26,27 @@
          these five dates share a weekday, and that weekday is the doomsday. -->
     <g>
       <g font-size="23" font-weight="700" fill="#ffff55" text-anchor="end">
-        <text x="836" y="106">4/4</text>
-        <text x="836" y="146">6/6</text>
-        <text x="836" y="186">8/8</text>
-        <text x="836" y="226">10/10</text>
-        <text x="836" y="266">12/12</text>
+        <text x="700" y="106">4/4</text>
+        <text x="700" y="146">6/6</text>
+        <text x="700" y="186">8/8</text>
+        <text x="700" y="226">10/10</text>
+        <text x="700" y="266">12/12</text>
       </g>
 
       <g stroke="#3a3a48" stroke-width="1.5" fill="none">
-        <path d="M852 99 h18"/>
-        <path d="M852 139 h18"/>
-        <path d="M852 179 h18"/>
-        <path d="M852 219 h18"/>
-        <path d="M852 259 h18"/>
-        <path d="M870 99 V259"/>
+        <path d="M716 99 h18"/>
+        <path d="M716 139 h18"/>
+        <path d="M716 179 h18"/>
+        <path d="M716 219 h18"/>
+        <path d="M716 259 h18"/>
+        <path d="M734 99 V259"/>
       </g>
-      <path d="M870 179 h26" stroke="#ffff55" stroke-width="2" fill="none"/>
-      <circle cx="900" cy="179" r="3.5" fill="#ffff55"/>
+      <path d="M734 179 h26" stroke="#ffff55" stroke-width="2" fill="none"/>
+      <circle cx="764" cy="179" r="3.5" fill="#ffff55"/>
 
-      <text x="916" y="172" font-size="18" fill="#ffffff">all fall on the same weekday.</text>
-      <text x="916" y="197" font-size="18" fill="#55ffff">That weekday is the year&#8217;s doomsday.</text>
-      <text x="916" y="232" font-size="14" fill="#7c7c8a">Find it, and any date is a short hop away.</text>
+      <text x="782" y="172" font-size="16" fill="#ffffff">all fall on the same weekday.</text>
+      <text x="782" y="196" font-size="16" fill="#55ffff">That weekday is the year&#8217;s doomsday.</text>
+      <text x="782" y="228" font-size="13" fill="#7c7c8a">Find it, and any date is a short hop away.</text>
     </g>
 
     <text x="64" y="338" font-size="12" fill="#55555f" letter-spacing="1.6">ORG 100H &#183; NASM -F BIN &#183; INT 21H &#183; DOSBOX COMPILED TO WEBASSEMBLY</text>
