@@ -23,6 +23,12 @@
            border: 1px solid var(--line); border-radius: 4px; padding: 4px 12px; cursor: pointer; }
   button:hover { border-color: var(--arch); }
   button.primary { background: var(--arch); border-color: var(--arch); color: #04202e; font-weight: 600; }
+  a.navlink { color: var(--text-dim); text-decoration: none; font-size: 12px; padding: 4px 8px;
+              border-radius: 4px; white-space: nowrap; }
+  a.navlink:hover { color: var(--arch); background: var(--bg-card); }
+  a.navlink .short { display: none; }
+  a.navlink.go { color: var(--green); border: 1px solid rgba(47, 208, 113, .35); }
+  a.navlink.go:hover { color: #04200f; background: var(--green); border-color: var(--green); }
   #status { color: var(--text-dim); font-size: 12px; }
   #status.running { color: var(--green); }
   #status.error   { color: var(--red); }
@@ -48,14 +54,26 @@
 
   /* The C++ site hides its editor at 760px because that editor is decorative.
      Here the editor is the point, so panes become tabs instead. */
+  /* Declared before the breakpoint so the breakpoint can switch it on. The
+     reverse order silently wins on equal specificity. */
+  #viewtabs { display: none; gap: 6px; }
+
   @media (max-width: 760px) {
     main { position: relative; }
     .pane { position: absolute; inset: 0; }
     body[data-view="code"] #right, body[data-view="run"] #left { display: none; }
     body[data-view="code"] #left, body[data-view="run"] #right { display: flex; }
     #viewtabs { display: flex; }
+
+    header { gap: 6px; padding: 6px 8px; }
+    header h1 { display: none; }
+    a.navlink.about { display: none; }
+    a.navlink .long { display: none; }
+    a.navlink .short { display: inline; }
+    #status { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    button { padding: 4px 9px; }
   }
-  #viewtabs { display: none; gap: 6px; }
+
 </style>
 </head>
 <body data-view="code">
@@ -66,15 +84,17 @@
   <button id="stop">Stop</button>
   <span id="status">idle</span>
   <span class="sp"></span>
+  <a class="navlink about" href="index.html">About</a>
+  <a class="navlink go" href="doomsday.html"><span class="long">Watch it run</span><span class="short">DOSBox</span> &#9654;</a>
   <span id="viewtabs">
     <button onclick="document.body.dataset.view='code'">Code</button>
-    <button onclick="document.body.dataset.view='run'">Terminal</button>
+    <button onclick="document.body.dataset.view='run'">DOS</button>
   </span>
 </header>
 
 <main>
   <section class="pane" id="left">
-    <div class="tab">prog.asm</div>
+    <div class="tab" id="filetab">prog.asm</div>
     <textarea id="editor" spellcheck="false"></textarea>
   </section>
   <section class="pane" id="right">
@@ -171,8 +191,15 @@
   };
   document.getElementById('stop').onclick = function () { engine.stop(); setStatus('stopped'); };
 
-  // Seed with the smoke test so the page does something useful on first load.
-  fetch('asm/smoke.asm')
+  // Seed with the smoke test so the page does something useful on first load,
+  // or with ?src=asm/<name>.asm, which is how doomsday.html hands its program
+  // over for editing. The pattern is deliberately narrow: this only ever opens
+  // an .asm file this site ships, never an arbitrary URL.
+  var want = new URLSearchParams(location.search).get('src') || '';
+  var src = /^asm\/[\w.-]+\.asm$/.test(want) ? want : 'asm/smoke.asm';
+  document.getElementById('filetab').textContent = src.replace(/^asm\//, '');
+
+  fetch(src)
     .then(function (r) { return r.ok ? r.text() : ''; })
     .then(function (t) { editor.value = t || '        org 100h\n'; })
     .catch(function () { editor.value = '        org 100h\n'; });
