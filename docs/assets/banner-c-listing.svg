@@ -54,7 +54,7 @@
   <rect x="0" y="0" width="1200" height="2" fill="#55ffff"/>
 
   <g font-family="Consolas, 'DejaVu Sans Mono', Menlo, ui-monospace, monospace">
-    <text x="64" y="118" font-size="12.5" letter-spacing="4" fill="#55555f">480 LINES &#183; NO LIBRARIES</text>
+    <text x="64" y="118" font-size="12.5" letter-spacing="4" fill="#55555f">723 LINES &#183; NO LIBRARIES</text>
 
     <text x="64" y="174" font-size="60" font-weight="700" letter-spacing="-1.6" fill="#ffffff">DOOMSDAY<tspan fill="#55ffff">.asm</tspan></text>
 
