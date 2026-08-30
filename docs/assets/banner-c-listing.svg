@@ -4,8 +4,8 @@
   <defs>
     <!-- The listing fades in from the left so the title never fights it. -->
     <linearGradient id="fade" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0.36" stop-color="#000" stop-opacity="0"/>
-      <stop offset="0.52" stop-color="#000" stop-opacity="1"/>
+      <stop offset="0.34" stop-color="#000000"/>
+      <stop offset="0.54" stop-color="#ffffff"/>
     </linearGradient>
     <mask id="listingMask">
       <rect width="1200" height="360" fill="url(#fade)"/>
