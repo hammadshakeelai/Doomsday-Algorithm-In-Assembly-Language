@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" width="1200" height="360" role="img" aria-label="Doomsday in 8086 assembly - NASM and DOSBox in the browser">
+  <title>Doomsday in 8086 Assembly</title>
+
+  <defs>
+    <!-- CRT scanlines. Two percent white, so it reads as texture rather than
+         as stripes at any size GitHub decides to rasterise this at. -->
+    <pattern id="scan" width="4" height="4" patternUnits="userSpaceOnUse">
+      <rect width="4" height="2" fill="#ffffff" opacity="0.018"/>
+    </pattern>
+    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0000aa" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#0000aa" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="360" fill="#07070c"/>
+  <circle cx="900" cy="180" r="330" fill="url(#glow)"/>
+  <rect width="1200" height="360" fill="url(#scan)"/>
+
+  <!-- The CGA palette, laid along the top edge as a colour key. Six swatches,
+       because sixteen would be decoration and six is the set this uses. -->
+  <g>
+    <rect x="0" y="0" width="1200" height="3" fill="#15151f"/>
+    <rect x="0"   y="0" width="64" height="3" fill="#0000aa"/>
+    <rect x="64"  y="0" width="64" height="3" fill="#55ffff"/>
+    <rect x="128" y="0" width="64" height="3" fill="#55ff55"/>
+    <rect x="192" y="0" width="64" height="3" fill="#ffff55"/>
+    <rect x="256" y="0" width="64" height="3" fill="#ffffff"/>
+  </g>
+
+  <g font-family="Consolas, 'DejaVu Sans Mono', Menlo, ui-monospace, monospace">
+
+    <!-- Title block -->
+    <text x="64" y="112" font-size="13" letter-spacing="4.2" fill="#55555f">NASM &#183; 8086 &#183; REAL DOSBOX</text>
+
+    <text x="64" y="182" font-size="58" font-weight="700" fill="#ffffff" letter-spacing="-1">DOOMSDAY</text>
+    <text x="64" y="182" font-size="58" font-weight="700" fill="#55ffff" letter-spacing="-1" dx="322">.asm</text>
+
+    <rect x="64" y="204" width="58" height="3" fill="#ffff55"/>
+
+    <text x="64" y="246" font-size="17" fill="#b6b6c2">Conway&#8217;s Doomsday algorithm, written by hand</text>
+    <text x="64" y="272" font-size="17" fill="#b6b6c2">in 8086 assembly &#8212; and running in a real DOS</text>
+    <text x="64" y="298" font-size="17" fill="#7c7c8a">machine, in your browser. No install, no server.</text>
+
+    <!-- The machine. Frame drawn with rects, not box-drawing characters, so it
+         cannot come apart if a renderer substitutes a different monospace. -->
+    <g>
+      <rect x="656" y="52" width="484" height="256" fill="#0000aa"/>
+      <rect x="666" y="62" width="464" height="236" fill="none" stroke="#ffffff" stroke-width="2"/>
+      <rect x="671" y="67" width="454" height="226" fill="none" stroke="#ffffff" stroke-width="1"/>
+
+      <g font-size="15">
+        <text x="692" y="102" fill="#55ff55">C:\&gt;<tspan fill="#ffffff" dx="9">doomsday.com</tspan></text>
+
+        <text x="692" y="140" fill="#ffff55">Welcome To Doomsday Date Machine</text>
+        <text x="692" y="162" fill="#b6b6c2" font-size="13">Choose any date using the Doomsday Algorithm</text>
+
+        <text x="692" y="204" fill="#ffffff">Tell me Year:  <tspan fill="#55ffff">2026</tspan></text>
+        <text x="692" y="226" fill="#ffffff">Tell me Month: <tspan fill="#55ffff">08</tspan></text>
+        <text x="692" y="248" fill="#ffffff">Tell me Day:   <tspan fill="#55ffff">30</tspan></text>
+      </g>
+
+      <!-- Stops where the program stops. A weekday here would be a nicer
+           banner and a false one. -->
+      <rect x="692" y="266" width="9" height="17" fill="#ffffff"/>
+    </g>
+
+    <text x="656" y="334" font-size="12" fill="#55555f" letter-spacing="1.6">ASSEMBLED BY NASM INSIDE DOSBOX, COMPILED TO WEBASSEMBLY</text>
+  </g>
+</svg>
